@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -25,22 +24,19 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-
-@SpringBootApplication
-class Config
-
-
 /**
  * @author <a href="mailto:josh@joshlong.com">Josh Long</a>
  */
 @SpringBootTest(
-		classes = [Config::class],
+		classes = [MockRestTemplatePinboardClientTest.Config::class],
 		properties = ["pinboard.token=1234"]
 )
 @AutoConfigureJsonTesters
 class MockRestTemplatePinboardClientTest(
-		@Autowired val restTemplatePinboardClient: RestTemplatePinboardClient
-) {
+		@Autowired val restTemplatePinboardClient: RestTemplatePinboardClient) {
+
+	@SpringBootApplication
+	class Config
 
 	private val restTemplate = RestTemplate()
 

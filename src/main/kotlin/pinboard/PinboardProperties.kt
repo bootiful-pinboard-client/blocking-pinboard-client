@@ -1,12 +1,12 @@
 package pinboard
 
+
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 
 /**
  * @author <a href="mailto:josh@joshlong.com">Josh Long</a>
  */
+@ConstructorBinding
 @ConfigurationProperties(prefix = "pinboard")
-class PinboardProperties(var token: String?) {
-
-	constructor() : this(null)
-}
+data class PinboardProperties(val token: String)

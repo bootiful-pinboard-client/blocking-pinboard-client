@@ -10,18 +10,13 @@ import pinboard.PinboardProperties
 
 @Configuration
 @EnableConfigurationProperties(PinboardProperties::class)
- class RestTemplatePinboardClientAutoConfiguration {
-
-	init {
-		println("the application is a Servlet-based application.")
-	}
-
+class RestTemplatePinboardClientAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnClass(value = arrayOf(RestTemplate::class))
-	fun restTemplatePinboardClient(properties: PinboardProperties): RestTemplatePinboardClient
-			= RestTemplatePinboardClient(properties.token!!)
+	fun restTemplatePinboardClient(properties: PinboardProperties): RestTemplatePinboardClient =
+			RestTemplatePinboardClient(properties.token)
 
 
 }
