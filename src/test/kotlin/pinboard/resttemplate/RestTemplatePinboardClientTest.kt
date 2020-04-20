@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.web.client.RestTemplate
 import pinboard.Bookmark
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -15,7 +16,8 @@ import kotlin.Comparator
 
 class RestTemplatePinboardClientTest {
 
-	private val pinboardClient = RestTemplatePinboardClient(System.getenv("PINBOARD_TOKEN"))
+	private val pinboardClient = RestTemplatePinboardClient(
+			System.getenv("PINBOARD_TOKEN"), RestTemplate())
 
 	private val testTag = "pbctest"
 

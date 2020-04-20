@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.client.ExpectedCount
@@ -33,16 +34,19 @@ import java.util.*
 )
 @AutoConfigureJsonTesters
 class MockRestTemplatePinboardClientTest(
+		@Autowired val restTemplate: RestTemplate,
 		@Autowired val restTemplatePinboardClient: RestTemplatePinboardClient) {
 
 	@SpringBootApplication
-	class Config
+	class Config {
 
-	private val restTemplate = RestTemplate()
+		@Bean
+		fun restTemplate(): RestTemplate = RestTemplate()
+	}
 
 	private var mockRestServiceServer: MockRestServiceServer? = null
 	private val auth = "1234"
-	private val commonUriParams = """ format=json&auth_token=${auth}   """.trim()
+	private val commonUriParams = """ auth_token=${auth}&format=json    """.trim()
 	private val testTag = "pbctest"
 	private val testTag2 = "pbctest2"
 
@@ -75,7 +79,7 @@ class MockRestTemplatePinboardClientTest(
                         "href":"http://garfield.com","description":"description","extended":"extended","hash":"hash","meta":"meta"}
             ]
          """
-		mockReply("/posts/all?fromdt=${FormatUtils.encodeDate(fromdt)}&meta=0&format=json&start=0&tag=twis&auth_token=$auth&results=-1", json)
+		mockReply("/posts/all?auth_token=$auth&format=json&fromdt=${FormatUtils.encodeDate(fromdt)}&meta=0&results=-1&start=0&tag=twis", json)
 		val postsByDate = restTemplatePinboardClient.getAllPosts(arrayOf("twis"), fromdt = fromdt)
 		val comparator = Comparator<Bookmark> { a, b -> a.time!!.compareTo(b.time) }
 		val minBookmark = postsByDate.minWith(comparator)
@@ -88,7 +92,7 @@ class MockRestTemplatePinboardClientTest(
 
 		val encodeDate = FormatUtils.encodeDate(bookmark.time!!)
 		mockReply("""
-            /posts/add?dt=$encodeDate&shared=yes&toread=yes&format=json&replace=yes&description=description&auth_token=$auth&url=http://garfield.com&extended=extended&tags=pbctest%20pbctest2 """
+            /posts/add?auth_token=$auth&description=description&dt=$encodeDate&extended=extended&format=json&replace=yes&shared=yes&tags=pbctest%20pbctest2&toread=yes&url=http://garfield.com"""
 				, """  { "status" : "done"}  """)
 		val post = restTemplatePinboardClient.addPost(bookmark.href!!, bookmark.description!!, bookmark.extended!!, bookmark.tags, bookmark.time!!, true, true, true)
 		assert(post) { "the bookmark has not been added." }
@@ -110,7 +114,7 @@ class MockRestTemplatePinboardClientTest(
                         ]
             }
          """
-		mockReply("/posts/get?auth_token=$auth&format=json&&url=http://garfield.com", json)
+		mockReply("/posts/get?auth_token=$auth&format=json&url=http://garfield.com", json)
 
 		val result = restTemplatePinboardClient.getPosts(bookmark.href)
 		val href = result.posts.first().href
@@ -132,7 +136,7 @@ class MockRestTemplatePinboardClientTest(
                         ]
             }
          """
-		val uri = """ /posts/recent?format=json&count=15&tag=pbctest%20pbctest2&auth_token=$auth  """
+		val uri = """ /posts/recent?auth_token=$auth&count=15&format=json&tag=pbctest%20pbctest2  """
 		mockReply(uri, json)
 		val result = restTemplatePinboardClient.getRecentPosts(tag = bookmark.tags)
 		val href = result.posts.first().href
@@ -148,7 +152,7 @@ class MockRestTemplatePinboardClientTest(
               {"tags":"pbctest pbctest2","time":"2017-08-16T08:21:11Z","shared":"yes","toread":"yes","href":"http://garfield.com/b","description":"description","extended":"extended","hash":"hash","meta":"meta"}
             ]
         """
-		mockReply("/posts/all?meta=0&format=json&start=0&tag=pbctest%20pbctest2&auth_token=$auth&results=-1", json)
+		mockReply("/posts/all?auth_token=$auth&format=json&meta=0&results=-1&start=0&tag=pbctest%20pbctest2", json)
 		assert(bookmark.href != null)
 		assert(this.restTemplatePinboardClient.getAllPosts(bookmark.tags).size == 1)
 	}
@@ -157,7 +161,7 @@ class MockRestTemplatePinboardClientTest(
 	fun getNoOfPostsByDate() {
 
 		val json = """{"tag":"twis cats","user":"starbuxman","dates":{"2017-08-16T08:31:25.755+0000":5}} """
-		mockReply("/posts/dates?format=json&tag=twis&auth_token=$auth", json)
+		mockReply("/posts/dates?auth_token=$auth&format=json&tag=twis", json)
 
 		val tagName = "twis"
 		val result = restTemplatePinboardClient.getCountOfPostsByDate(arrayOf(tagName))
@@ -172,7 +176,7 @@ class MockRestTemplatePinboardClientTest(
 	fun deleteTag() {
 		val first = this.pinboardClientTestTag.first()
 		val uri = """
-         tags/delete?format=json&tag=${first}&auth_token=${auth}
+         tags/delete?auth_token=${auth}&format=json&tag=${first}
         """
 		mockReply(uri, """ { "status" : "done" } """)
 		assert(restTemplatePinboardClient.deleteTag(first))
@@ -180,14 +184,14 @@ class MockRestTemplatePinboardClientTest(
 
 	@Test
 	fun secret() {
-		mockReply("/user/secret?format=json&auth_token=${auth}", """  {  "result" : "1234" } """)
+		mockReply("/user/secret?auth_token=${auth}&format=json", """  {  "result" : "1234" } """)
 		val userSecret = restTemplatePinboardClient.getUserSecret()
 		assert(userSecret.isNotBlank(), { "the userSecret should not be null" })
 	}
 
 	@Test
 	fun apiToken() {
-		mockReply("/user/api_token/?format=json&auth_token=${auth}", """ { "result" : "${auth}" }  """)
+		mockReply("/user/api_token/?auth_token=${auth}&format=json", """ { "result" : "${auth}" }  """)
 		val token = restTemplatePinboardClient.getApiToken()
 		assert(token.isNotBlank(), { "the token should not be null" })
 	}
@@ -202,7 +206,7 @@ class MockRestTemplatePinboardClientTest(
             {"tags":"pbctest pbctest2","time":"2017-08-16T08:21:11Z","shared":"yes","toread":"yes","href":"http://garfield.com/b","description":"description","extended":"extended","hash":"hash","meta":"meta"}
         ]
         """
-		val uri = """  /posts/all?meta=0&format=json&start=0&tag=${twisTag}&auth_token=${auth}&results=-1  """.trimIndent()
+		val uri = """  /posts/all?auth_token=${ auth }&format=json&meta=0&results=-1&start=0&tag=${twisTag}  """.trimIndent()
 		mockReply(uri, json)
 
 		val postsByTag = restTemplatePinboardClient.getAllPosts(arrayOf(twisTag))
@@ -228,7 +232,7 @@ class MockRestTemplatePinboardClientTest(
         ]
 
          """
-		mockReply("/posts/all?meta=0&format=json&start=0&tag=twis&auth_token=$auth&results=10", json)
+		mockReply("/posts/all?auth_token=$auth&format=json&meta=0&results=10&start=0&tag=twis", json)
 		val maxResults = 10
 		val postsByTag = restTemplatePinboardClient.getAllPosts(arrayOf("twis"), 0, maxResults)
 		assert(postsByTag.size == maxResults, { "there should be no more than 10 getAllPosts." })
@@ -256,8 +260,8 @@ class MockRestTemplatePinboardClientTest(
 
             }
         """
-		mockReply("/notes/list?format=json&auth_token=${auth}", notesJson)
-		mockReply("/notes/${noteId}?format=json&auth_token=${auth}", noteJson)
+		mockReply("/notes/list?auth_token=$auth&format=json", notesJson)
+		mockReply("/notes/${noteId}?auth_token=$auth&format=json", noteJson)
 
 		val userNotes = restTemplatePinboardClient.getUserNotes()
 		assert(userNotes.count == userNotes.notes!!.size)
@@ -295,7 +299,7 @@ class MockRestTemplatePinboardClientTest(
     """
 
 		val url = "http://infoq.com".trim()
-		mockReply(""" posts/suggest?format=json&auth_token=${auth}&url=${url} """, json)
+		mockReply(""" posts/suggest?auth_token=${auth}&format=json&url=${url} """, json)
 
 		val tagsForPost = restTemplatePinboardClient.suggestTagsForPost(url)
 		assert(tagsForPost.recommended!!.isNotEmpty())

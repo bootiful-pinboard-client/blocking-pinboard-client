@@ -21,7 +21,9 @@ import kotlin.collections.HashMap
  *
  * @author <a href="mailto:josh@joshlong.com">Josh Long</a>
  */
-open class RestTemplatePinboardClient(private val token: String) {
+open class RestTemplatePinboardClient(
+		private val token: String,
+		private val restTemplateParameter: RestTemplate) {
 
 	private val restTemplate: RestTemplate = RestTemplateBuilder()
 			.additionalCustomizers(RestTemplateCustomizer {
@@ -34,7 +36,7 @@ open class RestTemplatePinboardClient(private val token: String) {
 				listOfMts.add(parseMediaType)
 				messageConverter.supportedMediaTypes = listOfMts
 			})
-			.configure(RestTemplate())
+			.configure(this.restTemplateParameter)
 
 	private val pinboardApiEndpoint = "https://api.pinboard.in/v1"
 
