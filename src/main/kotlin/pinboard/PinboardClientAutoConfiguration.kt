@@ -1,4 +1,4 @@
-package pinboard.resttemplate
+package pinboard
 
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.ObjectProvider
@@ -8,11 +8,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
-import pinboard.PinboardProperties
 
 @Configuration
 @EnableConfigurationProperties(PinboardProperties::class)
-class RestTemplatePinboardClientAutoConfiguration {
+class PinboardClientAutoConfiguration {
 
 	private val log = LogFactory.getLog(javaClass)
 
@@ -21,12 +20,12 @@ class RestTemplatePinboardClientAutoConfiguration {
 	@ConditionalOnClass(value = arrayOf(RestTemplate::class))
 	fun restTemplatePinboardClient(properties: PinboardProperties,
 	                               objectProvider: ObjectProvider<RestTemplate>
-	): RestTemplatePinboardClient {
+	): PinboardClient {
 		val rt = objectProvider.getIfAvailable {
 			log.debug("no RestTemplate provided. Configuring a default one.")
 			RestTemplate()
 		}
-		return RestTemplatePinboardClient(properties.token, rt)
+		return PinboardClient(properties.token, rt)
 	}
 
 

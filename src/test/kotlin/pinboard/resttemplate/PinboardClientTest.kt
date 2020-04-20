@@ -8,15 +8,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.web.client.RestTemplate
 import pinboard.Bookmark
+import pinboard.PinboardClient
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.Comparator
 
 
-class RestTemplatePinboardClientTest {
+class PinboardClientTest {
 
-	private val pinboardClient = RestTemplatePinboardClient(
+	private val pinboardClient = PinboardClient(
 			System.getenv("PINBOARD_TOKEN"), RestTemplate())
 
 	private val testTag = "pbctest"

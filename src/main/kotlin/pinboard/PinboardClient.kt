@@ -1,4 +1,4 @@
-package pinboard.resttemplate
+package pinboard
 
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.boot.web.client.RestTemplateCustomizer
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
 import org.springframework.util.Assert
 import org.springframework.web.client.RestTemplate
-import pinboard.*
 import pinboard.ParamUtils.exchangeParameters
 
 import java.util.*
@@ -21,7 +20,7 @@ import kotlin.collections.HashMap
  *
  * @author <a href="mailto:josh@joshlong.com">Josh Long</a>
  */
-open class RestTemplatePinboardClient(
+open class PinboardClient(
 		private val token: String,
 		private val restTemplateParameter: RestTemplate) {
 
