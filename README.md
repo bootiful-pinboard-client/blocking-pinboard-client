@@ -1,7 +1,7 @@
 # A Blocking Pinboard Client
 
 
-![CI](https://github.com/joshlong/pinboard-client/workflows/CI/badge.svg)
+![CI](https://github.com/bootiful-pinboard-client/blocking-pinboard-client/workflows/CI/badge.svg)
 
 ## A Pinboard Client for non-Reactive, Traditional Spring MVC Applications
 
