@@ -11,3 +11,5 @@ The `pinboard.resttemplate.RestTemplatePinboardClient` is a client based on the 
 String myPinboardAccessToken = "...";
 new pinboard.resttemplate.RestTemplatePinboardClient(myPinboardAccessToken);
 ``` 
+
+This client uses the `RestTemplate`, which uses blocking IO. I wouldn't use this going forward, if you can use the reactive Pinboard client.
