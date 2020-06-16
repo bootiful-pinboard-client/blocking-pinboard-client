@@ -29,10 +29,10 @@ open class PinboardClient(
 				val messageConverter = it.messageConverters.find { it is AbstractJackson2HttpMessageConverter }
 						as AbstractJackson2HttpMessageConverter
 				val mts = messageConverter.supportedMediaTypes
-				val parseMediaType = MediaType.parseMediaType("text/plain;charset=utf-8")
 				val listOfMts = ArrayList<MediaType>()
 				listOfMts.addAll(mts)
-				listOfMts.add(parseMediaType)
+				listOfMts.add( MediaType.parseMediaType("text/plain;charset=utf-8"))
+				listOfMts.add( MediaType.parseMediaType("text/json;charset=utf-8"))
 				messageConverter.supportedMediaTypes = listOfMts
 			})
 			.configure(this.restTemplateParameter)
